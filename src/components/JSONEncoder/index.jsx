@@ -32,7 +32,7 @@ export const JSONEncoder = () => {
     <div className="space-y-8">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2  ">
             <ArrowRight className="h-6 w-6 text-blue-600" />
             JSON to Token Converter
           </CardTitle>

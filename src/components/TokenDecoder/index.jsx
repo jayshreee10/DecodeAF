@@ -1,19 +1,23 @@
 "use client";
 
-import { useState } from 'react';
-import { AlertCircle, ArrowLeftRight } from 'lucide-react';
-import { useTokenDecoder } from '../../hooks/useTokenDecoder';
-import { TokenInput } from './TokenInput';
-import { JsonDisplay, TableDisplay } from './OutputDisplay';
-import { JSONEncoder } from '../JSONEncoder';
-import { Badge } from '../ui/Badge';
-import { Button } from '../ui/Button';
-import { Card, CardContent } from '../ui/Card';
-import { TOKEN_TYPES, TOKEN_TYPE_COLORS, MODES } from '../../constants/tokenTypes';
+import { useState } from "react";
+import { AlertCircle, ArrowLeftRight } from "lucide-react";
+import { useTokenDecoder } from "../../hooks/useTokenDecoder";
+import { TokenInput } from "./TokenInput";
+import { JsonDisplay, TableDisplay } from "./OutputDisplay";
+import { JSONEncoder } from "../JSONEncoder";
+import { Badge } from "../ui/Badge";
+import { Button } from "../ui/Button";
+import { Card, CardContent } from "../ui/Card";
+import {
+  TOKEN_TYPES,
+  TOKEN_TYPE_COLORS,
+  MODES,
+} from "../../constants/tokenTypes";
 
 export const TokenDecoder = () => {
   const [mode, setMode] = useState(MODES.DECODE);
-  
+
   const {
     token,
     setToken,
@@ -23,18 +27,18 @@ export const TokenDecoder = () => {
     loading,
     secretKey,
     setSecretKey,
-    signatureValid
+    signatureValid,
   } = useTokenDecoder();
 
   return (
     <div className="space-y-8">
       {/* Mode Selector */}
       <Card>
-        <CardContent className="p-6">
+        <CardContent className="p-6 bg-blue-950">
           <div className="flex items-center justify-center gap-4">
             <Button
               onClick={() => setMode(MODES.DECODE)}
-              variant={mode === MODES.DECODE ? 'default' : 'outline'}
+              variant={mode === MODES.DECODE ? "default" : "outline"}
               className="flex items-center gap-2"
             >
               <ArrowLeftRight className="h-4 w-4" />
@@ -42,7 +46,7 @@ export const TokenDecoder = () => {
             </Button>
             <Button
               onClick={() => setMode(MODES.ENCODE)}
-              variant={mode === MODES.ENCODE ? 'default' : 'outline'}
+              variant={mode === MODES.ENCODE ? "default" : "outline"}
               className="flex items-center gap-2"
             >
               <ArrowLeftRight className="h-4 w-4 rotate-180" />
@@ -56,7 +60,7 @@ export const TokenDecoder = () => {
       {mode === MODES.DECODE ? (
         <>
           {/* Existing decode functionality */}
-          <Card>
+          <Card className="bg-black border-2 border-green-400 rounded-lg shadow-lg shadow-green-400/20">
             <CardContent className="p-6">
               <TokenInput
                 token={token}
@@ -65,28 +69,40 @@ export const TokenDecoder = () => {
                 setSecretKey={setSecretKey}
                 showJWTSecret={true}
                 tokenType={tokenType}
+                className="font-mono text-green-400"
               />
 
-              {/* Status Badges */}
+              {/* Status Badges - Hacker style */}
               {tokenType && (
                 <div className="flex items-center gap-4 mt-4">
-                  <Badge className={TOKEN_TYPE_COLORS[tokenType]}>
-                    Detected: {tokenType}
+                  <Badge
+                    className={`${TOKEN_TYPE_COLORS[tokenType]} bg-black border border-green-400 font-mono text-green-400`}
+                  >
+                    [root@localhost ~] Detected: {tokenType}
                   </Badge>
-                  
+
                   {tokenType === TOKEN_TYPES.JWT && signatureValid !== null && (
-                    <Badge variant={signatureValid ? 'success' : 'error'}>
-                      Signature: {signatureValid ? 'Valid' : 'Invalid'}
+                    <Badge
+                      className={`font-mono border ${
+                        signatureValid
+                          ? "border-green-400 text-green-400"
+                          : "border-red-400 text-red-400"
+                      }`}
+                    >
+                      $
+                      {signatureValid ? "ACCESS_GRANTED" : "INTRUSION_DETECTED"}
                     </Badge>
                   )}
                 </div>
               )}
 
-              {/* Error Display */}
+              {/* Error Display - CRT style */}
               {error && (
-                <div className="flex items-center gap-2 p-4 mt-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-                  <AlertCircle className="h-5 w-5" />
-                  {error}
+                <div className="flex items-center gap-2 p-4 mt-4 bg-black border-2 border-red-400 rounded-lg text-red-400 font-mono">
+                  <AlertCircle className="h-5 w-5 animate-pulse" />
+                  <span className="blink">
+                    {">>"} {error}
+                  </span>
                 </div>
               )}
             </CardContent>
@@ -95,21 +111,39 @@ export const TokenDecoder = () => {
           {/* Output Section */}
           {decodedData && !loading && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Decoded Results</h2>
-              
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                Decoded Results
+              </h2>
+
               {tokenType === TOKEN_TYPES.JWT && (
                 <>
-                  <JsonDisplay data={decodedData.header} title="Header (JSON)" />
-                  <TableDisplay data={decodedData.header} title="Header (Table)" />
-                  
-                  <JsonDisplay data={decodedData.payload} title="Payload (JSON)" />
-                  <TableDisplay data={decodedData.payload} title="Payload (Table)" />
-                  
+                  <JsonDisplay
+                    data={decodedData.header}
+                    title="Header (JSON)"
+                  />
+                  <TableDisplay
+                    data={decodedData.header}
+                    title="Header (Table)"
+                  />
+
+                  <JsonDisplay
+                    data={decodedData.payload}
+                    title="Payload (JSON)"
+                  />
+                  <TableDisplay
+                    data={decodedData.payload}
+                    title="Payload (Table)"
+                  />
+
                   <Card>
                     <CardContent className="p-6">
-                      <h4 className="text-lg font-semibold text-gray-800 mb-3">Signature</h4>
+                      <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                        Signature
+                      </h4>
                       <div className="bg-gray-100 p-4 rounded-lg">
-                        <code className="text-sm break-all">{decodedData.signature}</code>
+                        <code className="text-sm break-all">
+                          {decodedData.signature}
+                        </code>
                       </div>
                     </CardContent>
                   </Card>
@@ -120,17 +154,27 @@ export const TokenDecoder = () => {
                 <>
                   {decodedData.isJSON ? (
                     <>
-                      <JsonDisplay data={decodedData.decoded} title="Decoded Content (JSON)" />
-                      {typeof decodedData.decoded === 'object' && (
-                        <TableDisplay data={decodedData.decoded} title="Decoded Content (Table)" />
+                      <JsonDisplay
+                        data={decodedData.decoded}
+                        title="Decoded Content (JSON)"
+                      />
+                      {typeof decodedData.decoded === "object" && (
+                        <TableDisplay
+                          data={decodedData.decoded}
+                          title="Decoded Content (Table)"
+                        />
                       )}
                     </>
                   ) : (
                     <Card>
                       <CardContent className="p-6">
-                        <h4 className="text-lg font-semibold text-gray-800 mb-3">Decoded Content (Text)</h4>
+                        <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                          Decoded Content (Text)
+                        </h4>
                         <div className="bg-gray-100 p-4 rounded-lg">
-                          <pre className="whitespace-pre-wrap break-words text-sm">{decodedData.decoded}</pre>
+                          <pre className="whitespace-pre-wrap break-words text-sm">
+                            {decodedData.decoded}
+                          </pre>
                         </div>
                       </CardContent>
                     </Card>
